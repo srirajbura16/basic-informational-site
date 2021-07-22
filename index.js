@@ -1,31 +1,24 @@
-const http = require('http');
-const url = require('url');
+const express = require('express');
+const path = require('path');
+const app = express();
+const PORT = 8080;
 
-const fs = require('fs');
-
-const page404 = fs.readFileSync('./404.html', (err, data) => {
-  if (err) throw err;
-  return data;
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-http
-  .createServer(function (request, response) {
-    const q = url.parse(request.url, true);
-    let homePage = './index.html';
-    const page = `.${q.pathname}`;
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'contact.html'));
+});
 
-    let fileName = page == './' ? homePage : page;
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'about.html'));
+});
 
-    fs.readFile(fileName, (err, data) => {
-      if (err) {
-        response.writeHead(404, { 'content-Type': 'text/html' });
-        response.write(page404);
-        response.end();
-      } else {
-        response.writeHead(200, { 'content-Type': 'text/html' });
-        response.write(data);
-        response.end();
-      }
-    });
-  })
-  .listen(8080);
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '404.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`App running on http://localhost:${PORT}`);
+});
